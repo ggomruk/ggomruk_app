@@ -1,4 +1,4 @@
-import '../dto/backtest_dto.dart';
+import '../dto/backtest/backtest_dto.dart';
 
 class BacktestMockData {
   static final BacktestDto mockRequest = BacktestDto(

@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../../dto/backtest_dto.dart';
+import '../../dto/backtest/backtest_dto.dart';
 import '../../dto/common/response_wrapper/response_wrapper.dart';
+import 'backtest_api_interface.dart';
 
-class BacktestApiClient {
+class BacktestApiClient implements BacktestApiInterface {
   final String baseUrl;
   final http.Client httpClient;
 
@@ -13,6 +14,7 @@ class BacktestApiClient {
     http.Client? httpClient,
   }) : this.httpClient = httpClient ?? http.Client();
 
+  @override
   Future<ResponseWrapper<Map<String, dynamic>>> runBacktest(BacktestDto backtestDto) async {
     final url = Uri.parse('$baseUrl/api/algo/backtest');
     try {
