@@ -6,7 +6,6 @@ class BacktestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('backtest')),
       body: Center(
         child: Text(
           'backtest_page',

@@ -6,7 +6,6 @@ class TradePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('trade')),
       body: Center(
         child: Text(
           'trade_page',

@@ -281,7 +281,7 @@ class CustomTheme {
 
   static final TextStyle customAppBarStyle = TextStyle(
     color: AppColors.primary,
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: CustomFontWeight.bold,
     height: 48 / 39,
   );

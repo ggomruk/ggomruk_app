@@ -4,6 +4,8 @@ import '../pages/backtest/backtest_page.dart';
 import '../pages/trade/trade_page.dart';
 import '../pages/history/history_page.dart';
 import '../pages/user/user_page.dart';
+import 'component/top_app_bar.dart';
+import 'component/user_app_bar.dart';
 import 'cubit/bottom_navigation_cubit.dart';
 
 class MainScreen extends StatelessWidget {
@@ -25,6 +27,7 @@ class MainScreenView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      appBar: _buildAppBar(context),
       body: BlocBuilder<BottomNavCubit, int>(
         builder: (context, currentIndex) {
           return IndexedStack(
@@ -77,5 +80,15 @@ class MainScreenView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final currentNav = context.watch<BottomNavCubit>().currentNav;
+    switch (currentNav) {
+      case BottomNav.user:
+        return UserAppBar();
+      default:
+        return TopAppBar();
+    }
   }
 }
