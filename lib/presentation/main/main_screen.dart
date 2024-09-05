@@ -23,6 +23,7 @@ class MainScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: BlocBuilder<BottomNavCubit, int>(
         builder: (context, currentIndex) {
@@ -67,11 +68,11 @@ class MainScreenView extends StatelessWidget {
             type: BottomNavigationBarType.fixed,
             showSelectedLabels: true,
             showUnselectedLabels: true,
-            selectedItemColor: Colors.black,
-            unselectedItemColor: Colors.black.withOpacity(0.5),
-            selectedIconTheme: const IconThemeData(color:Colors.black),
-            unselectedIconTheme: IconThemeData(color: Colors.black
-                .withOpacity(0.3)),
+            selectedItemColor: theme.colorScheme.primary,
+            unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.5),
+            selectedIconTheme: IconThemeData(color: theme.colorScheme.primary),
+            unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withOpacity(0.5)),
+            backgroundColor: theme.colorScheme.surface,
           );
         },
       ),
