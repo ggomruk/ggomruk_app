@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:developer' as developer;
 
 import 'core/localization/app_localizations.dart';
 import 'core/theme/theme_cubit.dart';
@@ -9,6 +8,8 @@ import 'service_locator.dart';
 import 'domain/usecase/backtest/run_backtest_usecase.dart';
 import 'data/mock/backtest_mock_data.dart';
 import 'domain/repository/backtest_repository.dart';
+import 'core/exceptions/common_exception.dart';
+import 'core/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,24 +29,32 @@ void main() async {
 
     result.when(
       success: (backtestModel) {
-        developer.log('Backtest Repository Response:', name: 'Main');
-        developer.log('Status: true', name: 'Main');
-        developer.log('Code: SUCCESS', name: 'Main');
-        developer.log('Message: Backtest completed successfully', name: 'Main');
-        developer.log('Strategy Name: ${backtestModel.strategyName}', name: 'Main');
-        developer.log('Performance - Sharpe: ${backtestModel.performance.sharpe}', name: 'Main');
-        developer.log('Leverage Performance - CAGR: ${backtestModel.leveragePerformance.cagr}', name: 'Main');
-        developer.log('UID: ${backtestModel.uid}', name: 'Main');
+        CustomLogger.logger.i('Backtest Repository Response:');
+        CustomLogger.logger.i('Status: true');
+        CustomLogger.logger.i('Code: SUCCESS');
+        CustomLogger.logger.i('Message: Backtest completed successfully');
+        CustomLogger.logger.i('Strategy Name: ${backtestModel.strategyName}');
+        CustomLogger.logger.i('Performance - Sharpe: ${backtestModel.performance.sharpe}');
+        CustomLogger.logger.i('Leverage Performance - CAGR: ${backtestModel.leveragePerformance.cagr}');
+        CustomLogger.logger.i('UID: ${backtestModel.uid}');
       },
       failure: (errorResponse) {
-        developer.log('Backtest Repository Response:', name: 'Main');
-        developer.log('Status: false', name: 'Main');
-        developer.log('Code: ${errorResponse.code}', name: 'Main');
-        developer.log('Message: ${errorResponse.message}', name: 'Main');
+        CustomLogger.logger.e('Backtest Repository Response:');
+        CustomLogger.logger.e('Status: ${errorResponse.status}');
+        CustomLogger.logger.e('Code: ${errorResponse.code}');
+        CustomLogger.logger.e('Message: ${errorResponse.message}');
       },
     );
   } catch (e) {
-    developer.log('Unexpected error occurred: $e', name: 'Main', error: e);
+    if (e is CommonException) {
+      final errorResponse = createErrorResponse(e);
+      CustomLogger.logger.e('CommonException occurred:');
+      CustomLogger.logger.e('Status: ${errorResponse.status}');
+      CustomLogger.logger.e('Code: ${errorResponse.code}');
+      CustomLogger.logger.e('Message: ${errorResponse.message}');
+    } else {
+      CustomLogger.logger.e('Unexpected error occurred', error: e);
+    }
   }
 
   runApp(MyApp());
