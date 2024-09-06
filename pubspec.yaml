@@ -18,6 +18,8 @@ dependencies:
   flutter_bloc: ^8.1.6
   flutter_localization: ^0.2.1
   json_annotation: ^4.9.0
+  get_it: ^7.7.0
+  logger: ^2.4.0
 
 dev_dependencies:
   flutter_test:
