@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/localization/app_localizations.dart';
 import 'core/theme/theme_cubit.dart';
+import 'presentation/pages/backtest/bloc/backtest_bloc.dart';
 import 'presentation/routes/routes.dart';
 import 'service_locator.dart';
 import 'domain/usecase/backtest/run_backtest_usecase.dart';
@@ -63,8 +64,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider(create: (context) => locator<BacktestBloc>()),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeData>(
         builder: (context, theme) {
           return MaterialApp.router(

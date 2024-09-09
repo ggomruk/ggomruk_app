@@ -6,12 +6,14 @@ import 'data/mock/backtest_mock_api.dart';
 import 'data/repository_impl/backtest_repository_impl.dart';
 import 'domain/repository/backtest_repository.dart';
 import 'domain/usecase/backtest/run_backtest_usecase.dart';
+import 'presentation/pages/backtest/bloc/backtest_bloc.dart';
 
 final locator = GetIt.instance;
 
 void setLocator() {
   _data();
   _domain();
+  _presentation();
 }
 
 void _data() {
@@ -27,5 +29,12 @@ void _domain() {
   // Usecase
   locator.registerFactory<RunBacktestUsecase>(
         () => RunBacktestUsecase({}),
+  );
+}
+
+void _presentation() {
+  // Bloc
+  locator.registerFactory<BacktestBloc>(
+        () => BacktestBloc(repository: locator<BacktestRepository>()),
   );
 }
