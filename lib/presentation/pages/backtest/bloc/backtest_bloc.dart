@@ -19,21 +19,38 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
   }
 
   Future<void> _onRunBacktest(RunBacktest event, Emitter<BacktestState> emit) async {
-    emit(state.copyWith(status: BlocState.loading));
+    try {
+      emit(state.copyWith(status: BlocState.loading));
 
-    final usecase = RunBacktestUsecase(event.backtestDto.toBacktestParams());
-    final result = await usecase(repository);
+      final params = event.backtestDto.toBacktestParams();
 
-    result.when(
-      success: (backtestModel) => emit(state.copyWith(
-        status: BlocState.success,
-        result: backtestModel,
-      )),
-      failure: (error) => emit(state.copyWith(
+      final usecase = RunBacktestUsecase(params);
+      final result = await usecase(repository);
+
+      result.when(
+        success: (backtestModel) {
+          emit(state.copyWith(
+            status: BlocState.success,
+            result: backtestModel,
+          ));
+        },
+        failure: (error) {
+          emit(state.copyWith(
+            status: BlocState.failure,
+            error: error,
+          ));
+        },
+      );
+    } catch (e, stackTrace) {
+      emit(state.copyWith(
         status: BlocState.failure,
-        error: error,
-      )),
-    );
+        error: ErrorResponse(
+          status: 'ERROR',
+          code: 'UNEXPECTED_ERROR',
+          message: e.toString(),
+        ),
+      ));
+    }
   }
 
   void _onResetBacktest(ResetBacktest event, Emitter<BacktestState> emit) {

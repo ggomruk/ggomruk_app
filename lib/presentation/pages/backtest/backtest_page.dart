@@ -32,15 +32,33 @@ class BacktestPage extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
+
           final backtestDto = BacktestDto(
-            symbol: 'BTCUSDT',
-            usdt: 1000,
-            interval: '1h',
-            startDate: DateTime.now().subtract(const Duration(days: 30)),
-            endDate: DateTime.now(),
-            tc: 0.1,
-            leverage: 1,
-            strategies: {'SMA': {'fast': 10, 'slow': 20}},
+            symbol: "BTCUSDT",
+            usdt: 10000,
+            interval: "1m",
+            startDate: DateTime.parse("2024-01-15T02:00:00"),
+            endDate: DateTime.parse("2024-07-01T02:00:00"),
+            tc: -0.00085,
+            leverage: 3,
+            strategies: {
+              "RSI": {
+                "periods": 14,
+                "rsi_upper": 70,
+                "rsi_lower": 30
+              },
+              "SMA": {
+                "sma_s": 5,
+                "sma_m": 100,
+                "sma_l": 180
+              },
+              "RV": {
+                "return_thresh_low": -0.01,
+                "return_thresh_high": 0.01,
+                "volume_thresh_low": -0.5,
+                "volume_thresh_high": 0.5
+              }
+            },
           );
 
           context.read<BacktestBloc>().add(RunBacktest(backtestDto));

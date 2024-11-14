@@ -7,22 +7,37 @@ import 'backtest_mock_data.dart';
 class BacktestMockApiClient implements BacktestApiInterface {
   @override
   Future<ResponseWrapper<Map<String, dynamic>>> runBacktest(BacktestDto backtestDto) async {
-    // Simulate network delay
     await Future.delayed(Duration(seconds: 2));
 
-    // Check if the input matches the mock request
-    if (backtestDto.toJson().toString() == BacktestMockData.mockRequest.toJson().toString()) {
-      return ResponseWrapper<Map<String, dynamic>>(
-        status: true,
-        code: 'SUCCESS',
-        message: 'Backtest completed successfully',
-        data: BacktestMockData.mockResponse['result'],
-      );
-    } else {
+    try {
+      final requestJson = backtestDto.toJson();
+      final mockJson = BacktestMockData.mockRequest.toJson();
+
+      bool isValid =
+          requestJson['symbol'] == mockJson['symbol'] &&
+              requestJson['interval'] == mockJson['interval'] &&
+              requestJson['usdt'] == mockJson['usdt'] &&
+              requestJson['leverage'] == mockJson['leverage'];
+
+      if (isValid) {
+        return ResponseWrapper<Map<String, dynamic>>(
+          status: true,
+          code: 'SUCCESS',
+          message: 'Backtest completed successfully',
+          data: BacktestMockData.mockResponse['result'],
+        );
+      } else {
+        return ResponseWrapper(
+          status: false,
+          code: 'INVALID_INPUT',
+          message: 'Invalid input parameters',
+        );
+      }
+    } catch (e) {
       return ResponseWrapper(
         status: false,
-        code: 'INVALID_INPUT',
-        message: 'Invalid input parameters',
+        code: 'UNEXPECTED_ERROR',
+        message: e.toString(),
       );
     }
   }

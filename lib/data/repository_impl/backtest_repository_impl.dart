@@ -13,10 +13,22 @@ class BacktestRepositoryImpl implements BacktestRepository {
   @override
   Future<ResponseWrapper<BacktestModel>> runBacktest(Map<String, dynamic> params) async {
     try {
-      final backtestDto = BacktestDto.fromJson(params);
+      final backtestDto = BacktestDto(
+        symbol: params['symbol'] as String? ?? '',
+        usdt: (params['usdt'] as num?)?.toDouble() ?? 0.0,
+        interval: params['interval'] as String? ?? '',
+        startDate: DateTime.parse(params['startDate'] as String? ?? ''),
+        endDate: DateTime.parse(params['endDate'] as String? ?? ''),
+        tc: (params['commission'] as num?)?.toDouble() ?? 0.0,
+        leverage: (params['leverage'] as num?)?.toInt() ?? 1,
+        strategies: (params['strategies'] as Map<String, dynamic>?)?.map(
+              (k, v) => MapEntry(k, v as Map<String, dynamic>),
+        ) ?? {},
+      );
+
       final response = await apiClient.runBacktest(backtestDto);
 
-      if (response.status) {
+      if (response.status && response.data != null) {
         final backtestModel = BacktestMapper.fromDto(response.data!);
         return ResponseWrapper<BacktestModel>(
             status: true,
@@ -27,14 +39,14 @@ class BacktestRepositoryImpl implements BacktestRepository {
       } else {
         return ResponseWrapper<BacktestModel>(
             status: false,
-            message: response.message,
-            code: response.code
+            message: response.message ?? 'Unknown error',
+            code: response.code ?? 'UNKNOWN_ERROR'
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       return ResponseWrapper<BacktestModel>(
           status: false,
-          message: 'An unexpected error occurred',
+          message: 'An unexpected error occurred: ${e.toString()}',
           code: 'UNEXPECTED_ERROR'
       );
     }
