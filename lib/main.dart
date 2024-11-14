@@ -15,13 +15,10 @@ import 'core/utils/logger.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set up the service locator
   setLocator();
 
-  // Get the BacktestRepository from the service locator
   final backtestRepository = locator<BacktestRepository>();
 
-  // Create the RunBacktestUsecase with the mock request
   final runBacktestUsecase = RunBacktestUsecase(BacktestMockData.mockRequest.toJson());
 
   try {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/utils/constant.dart';
 import '../../../data/dto/backtest/backtest_dto.dart';
+import '../../../data/mock/backtest_mock_data.dart';
 import 'bloc/backtest_bloc.dart';
 
 class BacktestPage extends StatelessWidget {
@@ -32,35 +33,7 @@ class BacktestPage extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-
-          final backtestDto = BacktestDto(
-            symbol: "BTCUSDT",
-            usdt: 10000,
-            interval: "1m",
-            startDate: DateTime.parse("2024-01-15T02:00:00"),
-            endDate: DateTime.parse("2024-07-01T02:00:00"),
-            tc: -0.00085,
-            leverage: 3,
-            strategies: {
-              "RSI": {
-                "periods": 14,
-                "rsi_upper": 70,
-                "rsi_lower": 30
-              },
-              "SMA": {
-                "sma_s": 5,
-                "sma_m": 100,
-                "sma_l": 180
-              },
-              "RV": {
-                "return_thresh_low": -0.01,
-                "return_thresh_high": 0.01,
-                "volume_thresh_low": -0.5,
-                "volume_thresh_high": 0.5
-              }
-            },
-          );
-
+          final backtestDto = BacktestMockData.mockRequest;
           context.read<BacktestBloc>().add(RunBacktest(backtestDto));
         },
         child: const Text('Run Backtest'),
