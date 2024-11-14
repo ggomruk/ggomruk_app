@@ -30,24 +30,63 @@ class BacktestApiClient implements BacktestApiInterface {
         responseBody,
             (json) => json as Map<String, dynamic>,
       );
-    } on FormatException {
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  @override
+  Future<ResponseWrapper<List<String>>> getAvailableSymbols() async {
+    final url = Uri.parse('$baseUrl/api/algo/symbols');
+    try {
+      final response = await httpClient.get(url);
+      final responseBody = json.decode(response.body) as Map<String, dynamic>;
+
+      return ResponseWrapper<List<String>>.fromJson(
+        responseBody,
+            (json) => (json as List).cast<String>(),
+      );
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  @override
+  Future<ResponseWrapper<Map<String, Map<String, dynamic>>>> getAvailableStrategies() async {
+    final url = Uri.parse('$baseUrl/api/algo/strategies');
+    try {
+      final response = await httpClient.get(url);
+      final responseBody = json.decode(response.body) as Map<String, dynamic>;
+
+      return ResponseWrapper<Map<String, Map<String, dynamic>>>.fromJson(
+        responseBody,
+            (json) => (json as Map<String, dynamic>).map(
+              (key, value) => MapEntry(key, value as Map<String, dynamic>),
+        ),
+      );
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  ResponseWrapper<T> _handleError<T>(dynamic error) {
+    if (error is FormatException) {
       return ResponseWrapper(
         status: false,
         code: 'FORMAT_ERROR',
         message: 'Invalid response format',
       );
-    } on http.ClientException {
+    } else if (error is http.ClientException) {
       return ResponseWrapper(
         status: false,
         code: 'NETWORK_ERROR',
         message: 'Network error occurred',
       );
-    } catch (e) {
-      return ResponseWrapper(
-        status: false,
-        code: 'UNEXPECTED_ERROR',
-        message: 'An unexpected error occurred',
-      );
     }
+    return ResponseWrapper(
+      status: false,
+      code: 'UNEXPECTED_ERROR',
+      message: 'An unexpected error occurred',
+    );
   }
 }

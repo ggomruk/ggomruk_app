@@ -44,7 +44,69 @@ class BacktestRepositoryImpl implements BacktestRepository {
         );
       }
     } catch (e, stackTrace) {
+      print('Error in runBacktest: $e');
+      print('Stack trace: $stackTrace');
       return ResponseWrapper<BacktestModel>(
+          status: false,
+          message: 'An unexpected error occurred: ${e.toString()}',
+          code: 'UNEXPECTED_ERROR'
+      );
+    }
+  }
+
+  @override
+  Future<ResponseWrapper<List<String>>> getAvailableSymbols() async {
+    try {
+      final response = await apiClient.getAvailableSymbols();
+
+      if (response.status && response.data != null) {
+        return ResponseWrapper<List<String>>(
+            status: true,
+            data: response.data,
+            message: response.message,
+            code: response.code
+        );
+      } else {
+        return ResponseWrapper<List<String>>(
+            status: false,
+            message: response.message ?? 'Failed to fetch symbols',
+            code: response.code ?? 'UNKNOWN_ERROR'
+        );
+      }
+    } catch (e, stackTrace) {
+      print('Error in getAvailableSymbols: $e');
+      print('Stack trace: $stackTrace');
+      return ResponseWrapper<List<String>>(
+          status: false,
+          message: 'An unexpected error occurred: ${e.toString()}',
+          code: 'UNEXPECTED_ERROR'
+      );
+    }
+  }
+
+  @override
+  Future<ResponseWrapper<Map<String, Map<String, dynamic>>>> getAvailableStrategies() async {
+    try {
+      final response = await apiClient.getAvailableStrategies();
+
+      if (response.status && response.data != null) {
+        return ResponseWrapper<Map<String, Map<String, dynamic>>>(
+            status: true,
+            data: response.data,
+            message: response.message,
+            code: response.code
+        );
+      } else {
+        return ResponseWrapper<Map<String, Map<String, dynamic>>>(
+            status: false,
+            message: response.message ?? 'Failed to fetch strategies',
+            code: response.code ?? 'UNKNOWN_ERROR'
+        );
+      }
+    } catch (e, stackTrace) {
+      print('Error in getAvailableStrategies: $e');
+      print('Stack trace: $stackTrace');
+      return ResponseWrapper<Map<String, Map<String, dynamic>>>(
           status: false,
           message: 'An unexpected error occurred: ${e.toString()}',
           code: 'UNEXPECTED_ERROR'

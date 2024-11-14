@@ -62,12 +62,3 @@ class BacktestDto {
     };
   }
 }
-
-enum StrategyNames {
-  BB,
-  MACD,
-  RSI,
-  RV,
-  SMA,
-  SO,
-}

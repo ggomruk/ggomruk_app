@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/theme/theme_cubit.dart';
 import 'presentation/pages/backtest/bloc/backtest_bloc.dart';
+import 'presentation/pages/backtest/bloc/form/backtest_form_bloc.dart';
 import 'presentation/routes/routes.dart';
 import 'service_locator.dart';
 import 'domain/usecase/backtest/run_backtest_usecase.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => ThemeCubit()),
         BlocProvider(create: (context) => locator<BacktestBloc>()),
+        BlocProvider(create: (context) => locator<BacktestFormBloc>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeData>(
         builder: (context, theme) {

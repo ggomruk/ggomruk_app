@@ -7,6 +7,7 @@ import 'data/repository_impl/backtest_repository_impl.dart';
 import 'domain/repository/backtest_repository.dart';
 import 'domain/usecase/backtest/run_backtest_usecase.dart';
 import 'presentation/pages/backtest/bloc/backtest_bloc.dart';
+import 'presentation/pages/backtest/bloc/form/backtest_form_bloc.dart';
 
 final locator = GetIt.instance;
 
@@ -36,5 +37,9 @@ void _presentation() {
   // Bloc
   locator.registerFactory<BacktestBloc>(
         () => BacktestBloc(repository: locator<BacktestRepository>()),
+  );
+
+  locator.registerFactory<BacktestFormBloc>(
+        () => BacktestFormBloc(repository: locator<BacktestRepository>()),
   );
 }

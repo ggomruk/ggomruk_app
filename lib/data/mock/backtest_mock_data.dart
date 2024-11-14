@@ -56,4 +56,52 @@ class BacktestMockData {
       "uid": "001"
     }
   };
+
+  static final List<String> mockSymbols = [
+    'BTCUSDT',
+    'ETCUSDT',
+    'CTCUSDT',
+    '1BTCUSDT',
+    'B2TCUSDT',
+    'BT3CUSDT',
+    'BTC4USDT',
+    'BTCU5SDT',
+    'BTCUS6DT',
+    'BTCUSD7T',
+    'BTCUSDT8',
+    'B1TCUSDT',
+    'BT2CUSDT',
+    'BTC3USDT',
+    'BTCU4SDT',
+    'BTCUS5DT',
+    'BTCUSD6T',
+    'BTCUSDT7',
+    'B8TCUSDT',
+    'BT9CUSDT',
+  ];
+
+  static final Map<String, Map<String, dynamic>> mockStrategies = {
+    'RSI': {
+      'parameters': {
+        'periods': 14,
+        'rsi_upper': 70,
+        'rsi_lower': 30,
+      },
+    },
+    'SMA': {
+      'parameters': {
+        'sma_s': 5,
+        'sma_m': 100,
+        'sma_l': 180,
+      },
+    },
+    'RV': {
+      'parameters': {
+        'return_thresh_low': -0.01,
+        'return_thresh_high': 0.01,
+        'volume_thresh_low': -0.5,
+        'volume_thresh_high': 0.5,
+      },
+    },
+  };
 }
