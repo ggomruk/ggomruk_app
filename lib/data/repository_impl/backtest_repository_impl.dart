@@ -1,6 +1,6 @@
 import '../../domain/repository/backtest_repository.dart';
 import '../../domain/model/backtest/backtest_model.dart';
-import '../data_source/remote/backtest_api_interface.dart';
+import '../data_source/remote/backtest/backtest_api_interface.dart';
 import '../dto/backtest/backtest_dto.dart';
 import '../dto/common/response_wrapper/response_wrapper.dart';
 import '../mapper/backtest_mapper.dart';

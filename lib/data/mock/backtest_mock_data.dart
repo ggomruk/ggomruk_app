@@ -20,12 +20,12 @@ class BacktestMockData {
         "sma_m": 100,
         "sma_l": 180
       },
-      "RV": {
-        "return_thresh_low": -0.01,
-        "return_thresh_high": 0.01,
-        "volume_thresh_low": -0.5,
-        "volume_thresh_high": 0.5
-      }
+      // "RV": {
+      //   "return_thresh_low": -0.01,
+      //   "return_thresh_high": 0.01,
+      //   "volume_thresh_low": -0.5,
+      //   "volume_thresh_high": 0.5
+      // }
     },
   );
 

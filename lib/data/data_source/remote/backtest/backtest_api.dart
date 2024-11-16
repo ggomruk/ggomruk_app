@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../../dto/backtest/backtest_dto.dart';
-import '../../dto/common/response_wrapper/response_wrapper.dart';
+import '../../../dto/backtest/backtest_dto.dart';
+import '../../../dto/common/response_wrapper/response_wrapper.dart';
 import 'backtest_api_interface.dart';
 
 class BacktestApiClient implements BacktestApiInterface {

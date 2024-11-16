@@ -1,7 +1,7 @@
 import 'dart:async';
+import '../data_source/remote/backtest/backtest_api_interface.dart';
 import '../dto/backtest/backtest_dto.dart';
 import '../dto/common/response_wrapper/response_wrapper.dart';
-import '../data_source/remote/backtest_api_interface.dart';
 import 'backtest_mock_data.dart';
 
 class BacktestMockApiClient implements BacktestApiInterface {
