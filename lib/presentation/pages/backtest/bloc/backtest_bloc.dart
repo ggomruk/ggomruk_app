@@ -16,6 +16,7 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
   BacktestBloc({required this.repository}) : super(const BacktestState()) {
     on<RunBacktest>(_onRunBacktest);
     on<ResetBacktest>(_onResetBacktest);
+    on<HideBacktestResult>(_onHideBacktestResult); // 새로운 이벤트 핸들러
   }
 
   Future<void> _onRunBacktest(RunBacktest event, Emitter<BacktestState> emit) async {
@@ -23,7 +24,6 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
       emit(state.copyWith(status: BlocState.loading));
 
       final params = event.backtestDto.toBacktestParams();
-
       final usecase = RunBacktestUsecase(params);
       final result = await usecase(repository);
 
@@ -32,6 +32,7 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
           emit(state.copyWith(
             status: BlocState.success,
             result: backtestModel,
+            showResult: true, // 결과가 준비되면 모달을 보여주도록 설정
           ));
         },
         failure: (error) {
@@ -41,7 +42,7 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
           ));
         },
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       emit(state.copyWith(
         status: BlocState.failure,
         error: ErrorResponse(
@@ -51,6 +52,11 @@ class BacktestBloc extends Bloc<BacktestEvent, BacktestState> {
         ),
       ));
     }
+  }
+
+  void _onHideBacktestResult(HideBacktestResult event, Emitter<BacktestState> emit) {
+    // 모달을 숨기되 결과는 유지
+    emit(state.copyWith(showResult: false));
   }
 
   void _onResetBacktest(ResetBacktest event, Emitter<BacktestState> emit) {

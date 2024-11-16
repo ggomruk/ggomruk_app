@@ -5,8 +5,8 @@ class BacktestMockData {
     symbol: "BTCUSDT",
     usdt: 10000,
     interval: "1m",
-    startDate: DateTime.parse("2024-01-15T02:00:00"),
-    endDate: DateTime.parse("2024-07-01T02:00:00"),
+    startDate: DateTime.parse("2024-10-17T02:00:00"),
+    endDate: DateTime.parse("2024-11-16T02:00:00"),
     tc: -0.00085,
     leverage: 3,
     strategies: {

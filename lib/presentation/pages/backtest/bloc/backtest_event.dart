@@ -17,3 +17,7 @@ class RunBacktest extends BacktestEvent {
 }
 
 class ResetBacktest extends BacktestEvent {}
+
+class HideBacktestResult extends BacktestEvent {
+  const HideBacktestResult();
+}

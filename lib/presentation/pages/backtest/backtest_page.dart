@@ -7,27 +7,68 @@ import 'bloc/backtest_bloc.dart';
 import 'bloc/form/backtest_form_bloc.dart';
 import 'component/basic_settings_tab.dart';
 import 'component/strategy_settings_tab.dart';
+import 'widgets/backtest_result_modal.dart';
+import 'widgets/error_result_modal.dart';
 
 class BacktestPage extends StatelessWidget {
   const BacktestPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BacktestBloc, BacktestState>(
-      builder: (context, state) {
-        switch (state.status) {
-          case BlocState.initial:
-            return BlocProvider(
-              create: (context) => locator<BacktestFormBloc>()..add(LoadFormData()),
-              child: _buildSettingsForm(context),
-            );
-          case BlocState.loading:
-            return const Center(child: CircularProgressIndicator());
-          case BlocState.success:
-            return _buildSuccessView(context, state);
-          case BlocState.failure:
-            return _buildErrorView(context, state);
+    return BlocConsumer<BacktestBloc, BacktestState>(
+      listener: (context, state) {
+        // 성공 상태일 때 결과 모달 표시
+        if (state.status == BlocState.success && state.showResult) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => BacktestResultModal(
+              result: state.result!,
+              onClose: () {
+                context.read<BacktestBloc>().add(const HideBacktestResult());
+                Navigator.pop(context);
+              },
+            ),
+          );
         }
+
+        // 실패 상태일 때 에러 모달 표시
+        if (state.status == BlocState.failure) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => ErrorResultModal(
+              message: state.error?.message ?? "Unknown error",
+              onClose: () {
+                context.read<BacktestBloc>().add(ResetBacktest());
+                Navigator.pop(context);
+              },
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state.status == BlocState.initial || !state.isFormLoaded) {
+          return BlocProvider(
+            create: (context) => locator<BacktestFormBloc>()..add(LoadFormData()),
+            child: _buildSettingsForm(context),
+          );
+        }
+
+        if (state.status == BlocState.loading) {
+          return Stack(
+            children: [
+              _buildSettingsForm(context),
+              Container(
+                // color: Colors.black.withOpacity(0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          );
+        }
+
+        // 성공/실패 상태에서도 기존 form 유지
+        return _buildSettingsForm(context);
       },
     );
   }
@@ -91,45 +132,6 @@ class BacktestPage extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-
-  Widget _buildSuccessView(BuildContext context, BacktestState state) {
-    final result = state.result!;
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Strategy: ${result.strategyName}'),
-            Text('Sharpe Ratio: ${result.performance.sharpe.toStringAsFixed(2)}'),
-            Text('CAGR: ${(result.performance.cagr * 100).toStringAsFixed(2)}%'),
-            Text('Final USDT: ${result.performance.finalUsdt.toStringAsFixed(2)}'),
-            ElevatedButton(
-              onPressed: () => context.read<BacktestBloc>().add(ResetBacktest()),
-              child: const Text('Run Another Backtest'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorView(BuildContext context, BacktestState state) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Error: ${state.error?.message ?? "Unknown error"}'),
-            ElevatedButton(
-              onPressed: () => context.read<BacktestBloc>().add(ResetBacktest()),
-              child: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
