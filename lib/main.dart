@@ -1,48 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:developer' as developer;
 
 import 'core/localization/app_localizations.dart';
 import 'core/theme/theme_cubit.dart';
-import 'data/data_source/remote/backtest_api_interface.dart';
+import 'data/mock/trade_mock_data.dart';
+import 'domain/repository/trade_repository.dart';
+import 'domain/usecase/trade/start_trade_usecase.dart';
+import 'presentation/pages/backtest/bloc/backtest_bloc.dart';
+import 'presentation/pages/backtest/bloc/form/backtest_form_bloc.dart';
+import 'presentation/pages/trade/bloc/trade_bloc.dart';
 import 'presentation/routes/routes.dart';
-
-import 'data/mock/backtest_mock_api.dart';
+import 'service_locator.dart';
+import 'domain/usecase/backtest/run_backtest_usecase.dart';
 import 'data/mock/backtest_mock_data.dart';
-import 'data/repository_impl/backtest_repository_impl.dart';
-import 'domain/model/backtest/backtest_model.dart';
+import 'domain/repository/backtest_repository.dart';
+import 'core/exceptions/common_exception.dart';
+import 'core/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Create an instance of BacktestMockApiClient
-  final BacktestApiInterface apiClient = BacktestMockApiClient();
-  final backtestRepository = BacktestRepositoryImpl(apiClient: apiClient);
+  setLocator();
 
-  // Use the mock request data
-  final mockRequest = BacktestMockData.mockRequest.toJson();
+  final backtestRepository = locator<BacktestRepository>();
+
+  final runBacktestUsecase = RunBacktestUsecase(BacktestMockData.mockRequest.toJson());
+
+  final tradeRepository = locator<TradeRepository>();
+  final startTradeUsecase = StartTradeUsecase(
+    symbol: TradeMockData.mockRequest.params.symbol,
+    interval: TradeMockData.mockRequest.params.interval,
+    strategies: TradeMockData.mockRequest.params.strategies,
+    uid: TradeMockData.mockRequest.uid,
+  );
 
   try {
-    // Call the repository method
-    final response = await backtestRepository.runBacktest(mockRequest);
+    // Call the usecase
+    final result = await runBacktestUsecase.call(backtestRepository);
 
-    // Log the response
-    developer.log('Backtest Repository Response:', name: 'Main');
-    developer.log('Status: ${response.status}', name: 'Main');
-    developer.log('Code: ${response.code}', name: 'Main');
-    developer.log('Message: ${response.message}', name: 'Main');
-
-    if (response.status && response.data != null) {
-      final BacktestModel data = response.data!;
-      developer.log('Strategy Name: ${data.strategyName}', name: 'Main');
-      developer.log('Performance - Sharpe: ${data.performance.sharpe}', name: 'Main');
-      developer.log('Leverage Performance - CAGR: ${data.leveragePerformance.cagr}', name: 'Main');
-      developer.log('UID: ${data.uid}', name: 'Main');
-    } else {
-      developer.log('No data available', name: 'Main');
-    }
+    result.when(
+      success: (backtestModel) {
+        CustomLogger.logger.i('Backtest Repository Response:');
+        CustomLogger.logger.i('Status: true');
+        CustomLogger.logger.i('Code: SUCCESS');
+        CustomLogger.logger.i('Message: Backtest completed successfully');
+      },
+      failure: (errorResponse) {
+        CustomLogger.logger.e('Backtest Repository Response:');
+        CustomLogger.logger.e('Status: ${errorResponse.status}');
+        CustomLogger.logger.e('Code: ${errorResponse.code}');
+        CustomLogger.logger.e('Message: ${errorResponse.message}');
+      },
+    );
   } catch (e) {
-    developer.log('Error occurred: $e', name: 'Main', error: e);
+    if (e is CommonException) {
+      final errorResponse = createErrorResponse(e);
+      CustomLogger.logger.e('CommonException occurred:');
+      CustomLogger.logger.e('Status: ${errorResponse.status}');
+      CustomLogger.logger.e('Code: ${errorResponse.code}');
+      CustomLogger.logger.e('Message: ${errorResponse.message}');
+    } else {
+      CustomLogger.logger.e('Unexpected error occurred', error: e);
+    }
+  }
+
+  try {
+    // Test trade mock
+    final result = await startTradeUsecase(tradeRepository);
+
+    result.when(
+      success: (tradeModel) {
+        CustomLogger.logger.i('Trade Repository Response:');
+        CustomLogger.logger.i('Status: true');
+        CustomLogger.logger.i('Code: SUCCESS');
+        CustomLogger.logger.i('Message: Trade started successfully');
+        CustomLogger.logger.i('Symbol: ${tradeModel.params.symbol}');
+        CustomLogger.logger.i('Interval: ${tradeModel.params.interval}');
+        CustomLogger.logger.i('Strategies: ${tradeModel.params.strategies}');
+        CustomLogger.logger.i('UID: ${tradeModel.uid}');
+      },
+      failure: (errorResponse) {
+        CustomLogger.logger.e('Trade Repository Response:');
+        CustomLogger.logger.e('Status: ${errorResponse.status}');
+        CustomLogger.logger.e('Code: ${errorResponse.code}');
+        CustomLogger.logger.e('Message: ${errorResponse.message}');
+      },
+    );
+  } catch (e) {
+    if (e is CommonException) {
+      final errorResponse = createErrorResponse(e);
+      CustomLogger.logger.e('CommonException occurred:');
+      CustomLogger.logger.e('Status: ${errorResponse.status}');
+      CustomLogger.logger.e('Code: ${errorResponse.code}');
+      CustomLogger.logger.e('Message: ${errorResponse.message}');
+    } else {
+      CustomLogger.logger.e('Unexpected error occurred', error: e);
+    }
   }
 
   runApp(MyApp());
@@ -51,8 +104,13 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider(create: (context) => locator<BacktestBloc>()),
+        BlocProvider(create: (context) => locator<BacktestFormBloc>()),
+        BlocProvider(create: (context) => locator<TradeBloc>()),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeData>(
         builder: (context, theme) {
           return MaterialApp.router(
